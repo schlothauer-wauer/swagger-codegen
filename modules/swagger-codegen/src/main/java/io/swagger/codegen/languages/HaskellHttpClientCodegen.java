@@ -66,6 +66,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
 
     static final String MEDIA_TYPE = "mediaType";
     static final String MIME_NO_CONTENT = "MimeNoContent";
+    static final String MIME_ANY = "MimeAny";
 
     // vendor extensions
     static final String X_ALL_UNIQUE_PARAMS = "x-allUniqueParams";
@@ -141,6 +142,9 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         apiPackage = "API";
         //modelPackage = "Model";
 
+        // default HIDE_GENERATION_TIMESTAMP to true
+        hideGenerationTimestamp = Boolean.TRUE;
+
         // Haskell keywords and reserved function names, taken mostly from https://wiki.haskell.org/Keywords
         setReservedWordsLowerCase(
                 Arrays.asList(
@@ -215,7 +219,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         knownMimeDataTypes.put("application/octet-stream", "MimeOctetStream");
         knownMimeDataTypes.put("multipart/form-data", "MimeMultipartFormData");
         knownMimeDataTypes.put("text/plain", "MimePlainText");
-        knownMimeDataTypes.put("*/*", "MimeAny");
+        knownMimeDataTypes.put("*/*", MIME_ANY);
 
         importMapping.clear();
 
@@ -235,7 +239,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         cliOptions.add(CliOption.newBoolean(PROP_GENERATE_MODEL_CONSTRUCTORS, "Generate smart constructors (only supply required fields) for models").defaultValue(Boolean.TRUE.toString()));
         cliOptions.add(CliOption.newBoolean(PROP_GENERATE_ENUMS, "Generate specific datatypes for swagger enums").defaultValue(Boolean.TRUE.toString()));
         cliOptions.add(CliOption.newBoolean(PROP_GENERATE_FORM_URLENCODED_INSTANCES, "Generate FromForm/ToForm instances for models that are used by operations that produce or consume application/x-www-form-urlencoded").defaultValue(Boolean.TRUE.toString()));
-        cliOptions.add(CliOption.newBoolean(PROP_INLINE_MIME_TYPES, "Inline (hardcode) the content-type and accept parameters on operations, when there is only 1 option").defaultValue(Boolean.FALSE.toString()));
+        cliOptions.add(CliOption.newBoolean(PROP_INLINE_MIME_TYPES, "Inline (hardcode) the content-type and accept parameters on operations, when there is only 1 option").defaultValue(Boolean.TRUE.toString()));
 
 
         cliOptions.add(CliOption.newString(PROP_MODEL_DERIVING, "Additional classes to include in the deriving() clause of Models"));
@@ -245,7 +249,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         cliOptions.add(CliOption.newString(PROP_DATETIME_FORMAT, "format string used to parse/render a datetime"));
         cliOptions.add(CliOption.newString(PROP_DATE_FORMAT, "format string used to parse/render a date").defaultValue(defaultDateFormat));
 
-        cliOptions.add(CliOption.newBoolean(CodegenConstants.HIDE_GENERATION_TIMESTAMP, "hides the timestamp when files were generated").defaultValue(Boolean.TRUE.toString()));
+        cliOptions.add(CliOption.newBoolean(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC).defaultValue(Boolean.TRUE.toString()));
 
     }
 
@@ -339,12 +343,6 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
     @Override
     public void processOpts() {
         super.processOpts();
-        // default HIDE_GENERATION_TIMESTAMP to true
-        if (additionalProperties.containsKey(CodegenConstants.HIDE_GENERATION_TIMESTAMP)) {
-            convertPropertyToBooleanAndWriteBack(CodegenConstants.HIDE_GENERATION_TIMESTAMP);
-        } else {
-            additionalProperties.put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, true);
-        }
 
         if (additionalProperties.containsKey(PROP_ALLOW_FROMJSON_NULLS)) {
             setAllowFromJsonNulls(convertPropertyToBoolean(PROP_ALLOW_FROMJSON_NULLS));
@@ -385,7 +383,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         if (additionalProperties.containsKey(PROP_INLINE_MIME_TYPES)) {
             setInlineMimeTypes(convertPropertyToBoolean(PROP_INLINE_MIME_TYPES));
         } else {
-            setInlineMimeTypes(false);
+            setInlineMimeTypes(true);
         }
 
         if (additionalProperties.containsKey(PROP_GENERATE_LENSES)) {
@@ -836,7 +834,9 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
     private void processInlineConsumesContentType(CodegenOperation op, Map<String, String> m) {
         if (op.vendorExtensions.containsKey(X_INLINE_CONTENT_TYPE)) return;
         if ((boolean) additionalProperties.get(PROP_INLINE_MIME_TYPES)
-                && op.consumes.size() == 1) {
+                && op.consumes.size() == 1
+                && op.consumes.get(0).get(X_MEDIA_DATA_TYPE) != MIME_ANY
+                && op.consumes.get(0).get(X_MEDIA_DATA_TYPE) != MIME_NO_CONTENT) {
             op.vendorExtensions.put(X_INLINE_CONTENT_TYPE, m);
             for (CodegenParameter param : op.allParams) {
                 if (param.isBodyParam && param.required) {
@@ -848,7 +848,9 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
 
     private void processInlineProducesContentType(CodegenOperation op, Map<String, String> m) {
         if ((boolean) additionalProperties.get(PROP_INLINE_MIME_TYPES)
-                && op.produces.size() == 1) {
+                && op.produces.size() == 1
+                && op.produces.get(0).get(X_MEDIA_DATA_TYPE) != MIME_ANY
+                && op.produces.get(0).get(X_MEDIA_DATA_TYPE) != MIME_NO_CONTENT) {
             op.vendorExtensions.put(X_INLINE_ACCEPT, m);
         }
     }

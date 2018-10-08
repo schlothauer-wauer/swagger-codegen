@@ -1,8 +1,8 @@
-## @swagger/angular2-typescript-petstore@0.0.1
+## @
 
 ### Building
 
-To build an compile the typescript sources to javascript use:
+To install the required dependencies and to build the typescript sources run:
 ```
 npm install
 npm run build
@@ -14,15 +14,15 @@ First build the package than run ```npm publish```
 
 ### consuming
 
-navigate to the folder of your consuming project and run one of next commando's.
+Navigate to the folder of your consuming project and run one of next commands.
 
 _published:_
 
 ```
-npm install @swagger/angular2-typescript-petstore@0.0.1 --save
+npm install @ --save
 ```
 
-_unPublished (not recommended):_
+_without publishing (not recommended):_
 
 ```
 npm install PATH_TO_GENERATED_PACKAGE --save
@@ -37,15 +37,22 @@ npm link
 
 In your project:
 ```
-npm link @swagger/angular2-typescript-petstore@0.0.1
+npm link 
 ```
+
+__Note for Windows users:__ The Angular CLI has troubles to use linked npm packages.
+Please refer to this issue https://github.com/angular/angular-cli/issues/8284 for a solution / workaround.
+Published packages are not effected by this issue.
+
+
+#### General usage
 
 In your Angular project:
 
 
 ```
 // without configuring providers
-import { ApiModule } from '@swagger/angular2-typescript-petstore';
+import { ApiModule } from '';
 
 import { HttpModule } from '@angular/http';
 
@@ -63,7 +70,7 @@ export class AppModule {}
 
 ```
 // configuring providers
-import { ApiModule, Configuration, ConfigurationParameters } from '@swagger/angular2-typescript-petstore';
+import { ApiModule, Configuration, ConfigurationParameters } from '';
 
 export function apiConfigFactory (): Configuration => {
   const params: ConfigurationParameters = {
@@ -82,7 +89,7 @@ export class AppModule {}
 ```
 
 ```
-import { DefaultApi } from '@swagger/angular2-typescript-petstore';
+import { DefaultApi } from '';
 
 export class AppComponent {
 	 constructor(private apiGateway: DefaultApi) { }
@@ -119,7 +126,7 @@ export class AppModule {
 If different than the generated base path, during app bootstrap, you can provide the base path to your service. 
 
 ```
-import { BASE_PATH } from '@swagger/angular2-typescript-petstore';
+import { BASE_PATH } from '';
 
 bootstrap(AppComponent, [
     { provide: BASE_PATH, useValue: 'https://your-web-service.com' },
@@ -128,7 +135,7 @@ bootstrap(AppComponent, [
 or
 
 ```
-import { BASE_PATH } from '@swagger/angular2-typescript-petstore';
+import { BASE_PATH } from '';
 
 @NgModule({
     imports: [],
@@ -152,7 +159,7 @@ export const environment = {
 
 In the src/app/app.module.ts:
 ```
-import { BASE_PATH } from '@swagger/angular2-typescript-petstore';
+import { BASE_PATH } from '';
 import { environment } from '../environments/environment';
 
 @NgModule({

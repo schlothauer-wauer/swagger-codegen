@@ -14,8 +14,8 @@ import io.swagger.util.Json;
 import java.util.*;
 
 abstract public class AbstractAdaCodegen extends DefaultCodegen implements CodegenConfig {
-    protected String packageName = "swagger";
-    protected String projectName = "Swagger";
+    protected String packageName = "defaultPackage";
+    protected String projectName = "defaultProject";
     protected List<Map<String, Object>> orderedModels;
     protected Map<String, List<String>> modelDepends;
     protected Map<String, String> nullableTypeMapping;
@@ -142,13 +142,6 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
 
         languageSpecificPrimitives = new HashSet<String>(
                 Arrays.asList("integer", "boolean", "Integer", "Character", "Boolean", "long", "float", "double"));
-    }
-
-    protected void addOption(String key, String description, String defaultValue) {
-        CliOption option = new CliOption(key, description);
-        if (defaultValue != null)
-            option.defaultValue(defaultValue);
-        cliOptions.add(option);
     }
 
     public String toFilename(String name) {
@@ -478,8 +471,8 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                         if (!d.contains(item.datatype)) {
                             // LOGGER.info("Model " + m.name + " uses " + p.datatype);
                             d.add(item.datatype);
-                            isModel = true;
                         }
+                        isModel = true;
                     }
                     p.vendorExtensions.put("x-is-model-type", isModel);
                 }

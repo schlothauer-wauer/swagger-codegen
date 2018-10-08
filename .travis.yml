@@ -39,7 +39,8 @@ before_install:
   - npm install -g typescript
   - npm install -g npm
   - npm config set registry http://registry.npmjs.org/
-  - sudo pip install virtualenv
+  # set python 3.6.3 as default
+  - source ~/virtualenv/python3.6/bin/activate
   # to run petstore server locally via docker
   - docker pull swaggerapi/petstore
   - docker run -d -e SWAGGER_HOST=http://petstore.swagger.io -e SWAGGER_BASE_PATH=/v2 -p 80:8080 swaggerapi/petstore
@@ -87,10 +88,10 @@ script:
 
 after_success:
   # push a snapshot version to maven repo
-  - if [ $SONATYPE_USERNAME ] && [ -z $TRAVIS_TAG ] && [ "$TRAVIS_BRANCH" = "master" ]; then
-      mvn clean deploy --settings .travis/settings.xml;
-      echo "Finished mvn clean deploy for $TRAVIS_BRANCH";
-    fi;
+  #- if [ $SONATYPE_USERNAME ] && [ -z $TRAVIS_TAG ] && [ "$TRAVIS_BRANCH" = "master" ]; then
+  #    mvn clean deploy --settings .travis/settings.xml;
+  #    echo "Finished mvn clean deploy for $TRAVIS_BRANCH";
+  #  fi;
 
 env:
   - DOCKER_GENERATOR_IMAGE_NAME=swaggerapi/swagger-generator DOCKER_CODEGEN_CLI_IMAGE_NAME=swaggerapi/swagger-codegen-cli
